@@ -121,6 +121,10 @@ else:
     for ticker in tickers:
         ticker_data = predictions[predictions['Ticker'] == ticker]
 
+        # Gerçek ve tahmin değerleri arasındaki doğruluk oranını hesapla
+        valid_data = ticker_data.dropna(subset=['Real Price', 'yhat'])
+        accuracy = 100 - ((abs(valid_data['Real Price'] - valid_data['yhat']) / valid_data['Real Price']).mean() * 100)
+
         # Grafik oluştur
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=ticker_data['ds'], y=ticker_data['Real Price'], mode='lines', name='Gerçek Fiyat'))
@@ -128,7 +132,7 @@ else:
 
         # Grafik başlığı ve etiketler
         fig.update_layout(
-            title=f"{ticker} Fiyat Tahmini",
+            title=f"{ticker} Fiyat Tahmini (Doğruluk: {accuracy:.2f}%)",
             xaxis_title="Tarih",
             yaxis_title="Fiyat",
             xaxis_rangeslider_visible=True
