@@ -29,7 +29,9 @@ graph_directory = base_directory / "Grafikler"
 all_data = []
 
 # Her bir hisse senedi için verileri çek
+print("Veriler çekilmeye başlandı...")
 for ticker in tickers:
+    print(f"{ticker} için veri çekiliyor...")
     data = yf.download(ticker, start=start_date, end=end_date, progress=False)
     if data.empty:
         print(f"{ticker} için veri bulunamadı.")
@@ -53,6 +55,7 @@ else:
     all_data = all_data[['Date', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume']]
 
     # Eksik verileri doldurma işlemleri
+    print("Eksik veriler dolduruluyor...")
     all_data = all_data.infer_objects()
     all_data.interpolate(method='linear', inplace=True)  # Doğrusal olarak eksik verileri doldur
     all_data.ffill(inplace=True)  # İleri doldurma
@@ -77,6 +80,7 @@ else:
     predictions = []
 
     for ticker in tickers:
+        print(f"{ticker} için tahmin yapılıyor...")
         # Prophet'e uygun veri çerçevesi oluştur
         ticker_data = all_data[all_data['Ticker'] == ticker][['Date', 'Close']].rename(columns={'Date': 'ds', 'Close': 'y'})
 
@@ -113,6 +117,7 @@ else:
     os.makedirs(graph_folder, exist_ok=True)
 
     # Grafik oluşturma ve kaydetme
+    print("Grafikler oluşturuluyor...")
     for ticker in tickers:
         ticker_data = predictions[predictions['Ticker'] == ticker]
 
@@ -132,6 +137,7 @@ else:
         # Grafiği HTML dosyası olarak kaydet
         graph_path = graph_folder / f"{ticker}_fiyat_tahmini_{current_date}.html"
         fig.write_html(graph_path)
+    print("Grafikler oluşturuldu.")
 
     # CSV dosyasını oku ve tabloyu göster
     try:
